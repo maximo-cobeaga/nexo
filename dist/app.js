@@ -146,7 +146,7 @@ function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'
 async function analyzeProject(){
  if(!local){navigate('integrations');toast('El análisis de carpetas se ejecuta con Nexo local y Claude Code.');return;}
  if(!selected){const ps=state.projects.filter(p=>p.status==='active');if(!ps.length){projectForm();return;}openModal('¿En qué proyecto avanzamos?',`<p class="modal-subtitle">Claude revisará su carpeta y objetivo. Las propuestas aparecerán en Sugerencias. Usa tu sesión y límites de Claude Code.</p><div class="nav-list">${ps.map(p=>`<button class="workspace-switch" data-analyze-project="${esc(p.id)}"><span class="project-logo" style="${theme(p)}">${projectIcon(p)}</span><span class="workspace-copy"><b>${esc(p.name)}</b><small>${esc(p.path||'Primero vinculá una carpeta')}</small></span>${icon('chevron')}</button>`).join('')}</div>`);return;}
- const p=projectById(selected);if(!p.path||!p.goal){projectForm(true);toast('Completá la carpeta local y el objetivo para analizarlo.');return;}
+ const p=projectById(selected);if(!p.path&&!p.repository){projectForm(true);toast('Agregá una carpeta local o un repositorio de GitHub para analizarlo.');return;}
  try{const job=await request('/api/analyze',{method:'POST',body:JSON.stringify({projectId:p.id})});jobs.push(job);closeOverlay();render();toast('Análisis iniciado. Podés seguir usando el tablero.');}catch(e){toast(e.message,true);}
 }
 async function action(name,el){
@@ -217,4 +217,5 @@ async function boot(){
 }
 boot();
 // Un proyecto puede nacer sin objetivo; solo el análisis con IA exige uno.
-new MutationObserver(()=>{const goal=overlay.querySelector('#p-goal[required]');if(goal){goal.required=false;const label=overlay.querySelector('label[for="p-goal"]');if(label&&!label.textContent.includes('Opcional'))label.innerHTML='¿Qué significa terminarlo? <small>Opcional por ahora</small>';}}).observe(overlay,{childList:true,subtree:true});
+new MutationObserver(()=>{const goal=overlay.querySelector('#p-goal[required]');if(goal){goal.required=false;const label=overlay.querySelector('label[for="p-goal"]');if(label&&!label.textContent.includes('Opcional'))label.innerHTML='¿Qué significa terminarlo? <small>Opcional por ahora</small>';}const pathInput=overlay.querySelector('#p-path');if(pathInput&&window.nexoDesktop&&!overlay.querySelector('[data-choose-folder]')){const choose=document.createElement('button');choose.type='button';choose.className='btn path-picker-button';choose.dataset.chooseFolder='';choose.textContent='Elegir carpeta';pathInput.insertAdjacentElement('afterend',choose);}}).observe(overlay,{childList:true,subtree:true});
+document.addEventListener('click',async event=>{if(!event.target.closest('[data-choose-folder]'))return;try{const folder=await window.nexoDesktop?.chooseFolder();if(folder){const input=overlay.querySelector('#p-path');if(input)input.value=folder;}}catch{toast('No se pudo abrir el explorador de carpetas.',true);}});

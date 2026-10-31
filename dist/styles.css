@@ -38,3 +38,4 @@
 :root[data-theme="dark"] .theme-toggle{color:#f2cf81;background:#2b2736}:root[data-theme="dark"] .kbd{background:#232530;border-color:#3b3e4c;color:#b9bac8}
 .blocked-tag{font-size:8px;padding:3px 5px;border-radius:4px;background:#fff3df;color:#b77637;font-weight:600}
 :root[data-theme="dark"] .blocked-tag{background:#3a2d1e;color:#e8b56f}
+.path-picker-button{margin-top:8px;align-self:start}

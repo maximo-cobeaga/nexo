@@ -4,9 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {analyze} from '../local/analysis.mjs';
-test('rechaza carpetas inexistentes y objetivos vacíos antes de ejecutar Claude',async()=>{
+test('rechaza carpetas inexistentes antes de ejecutar Claude',async()=>{
  await assert.rejects(analyze({path:'/missing-nexo-project',goal:'MVP'},[],()=>{},()=>{}),/carpeta local/);
- await assert.rejects(analyze({path:os.tmpdir(),goal:''},[],()=>{},()=>{}),/objetivo/);
 });
 test('muestra un error concreto cuando Claude Code no está instalado',async t=>{
  const old=process.env.NEXO_CLAUDE_BIN;process.env.NEXO_CLAUDE_BIN=path.join(os.tmpdir(),'nonexistent-nexo-claude');t.after(()=>{if(old===undefined)delete process.env.NEXO_CLAUDE_BIN;else process.env.NEXO_CLAUDE_BIN=old;});

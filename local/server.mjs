@@ -8,6 +8,12 @@ import { Store } from './store.mjs';
 import { analyze } from './analysis.mjs';
 const root=fileURLToPath(new URL('../dist/',import.meta.url));
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
+const cloneRepository=(repository,directory)=>new Promise((resolve,reject)=>{
+  if(!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/.test(repository))return reject(Error('El repositorio debe ser una URL válida de GitHub.'));
+  if(fs.existsSync(directory))return reject(Error('Ya existe una carpeta para este repositorio. Elegí una carpeta local o eliminá esa copia antes de reintentar.'));
+  fs.mkdirSync(path.dirname(directory),{recursive:true,mode:0o700});
+  execFile('git',['clone','--depth','1',repository,directory],{timeout:180000,windowsHide:true},error=>error?reject(Error(`No se pudo clonar el repositorio. ${error.message}`)):resolve(directory));
+});
 export async function startServer({port=Number(process.env.PORT)||4318,store=new Store()}={}) {
   const token=crypto.randomBytes(32).toString('hex');const jobs=new Map();let childProcesses=new Set();
   const json=(res,code,data)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
@@ -30,7 +36,8 @@ export async function startServer({port=Number(process.env.PORT)||4318,store=new
           execFile(process.env.NEXO_CLAUDE_BIN||'claude',['--version'],{timeout:7000,windowsHide:true},(err,out)=>json(res,200,{available:!err,version:err?null:out.trim()}));return;
         }
         if(url.pathname==='/api/analyze'&&req.method==='POST') {
-          const {projectId}=await body(req);const s=store.read();const project=s.projects.find(p=>p.id===projectId);if(!project)throw Error('Proyecto inexistente');
+          const {projectId}=await body(req);const s=store.read();let project=s.projects.find(p=>p.id===projectId);if(!project)throw Error('Proyecto inexistente');
+          if(!project.path&&project.repository){const parts=new URL(project.repository).pathname.replace(/^\//,'').replace(/\.git$/,'').split('/');const destination=path.join(store.dir,'projects',`${parts[0]}--${parts[1]}`);await cloneRepository(project.repository,destination);store.operate({type:'project.update',id:projectId,patch:{path:destination,nextStep:'Repositorio clonado. Pendiente de análisis inicial.'}});project=store.read().projects.find(p=>p.id===projectId);}
           if([...jobs.values()].some(j=>j.status==='running'))throw Error('Ya hay un análisis en curso. Esperá a que termine.');
           const id=crypto.randomUUID();const job={id,projectId,status:'running',startedAt:new Date().toISOString()};jobs.set(id,job);
           let child;
