@@ -51,13 +51,13 @@ Herramientas disponibles:
 | `nexo_list_sessions` | Consultar los cierres de sesiones anteriores |
 | `nexo_record_session` | Guardar avances, bloqueos y próximo paso al cerrar una sesión |
 
-Al comenzar una sesión podés pedir: “Consultá Nexo con `nexo_get_context` para este proyecto y decime qué falta. Revisá el código y proponé pendientes necesarios para cumplir el objetivo, sin duplicarlos. Guardalos como sugerencias con evidencia. Actualizá el perfil con un resumen de qué es el proyecto y cómo ejecutarlo.” El MCP reconoce el proyecto por la carpeta actual (o se le puede indicar `path`) y lee el mismo archivo que la interfaz local. Por eso, un cambio aceptado en cualquiera de los dos lados queda disponible inmediatamente para el otro; la interfaz local lo refresca automáticamente.
+Al comenzar una sesión podés pedir: “Consultá Nexo con `nexo_get_context` para este proyecto. Leé el código y la documentación, completá todo el perfil que puedas demostrar (qué es, tecnologías, comando de inicio, notas y próximo paso) y decime qué falta. Proponé pendientes necesarios para cumplir el objetivo, sin duplicarlos.” El agente usa `nexo_update_project`; no inventa campos sin evidencia. El MCP reconoce el proyecto por la carpeta actual (o se le puede indicar `path`) y lee el mismo archivo que la interfaz local. Por eso, un cambio aceptado en cualquiera de los dos lados queda disponible inmediatamente para el otro; la interfaz local lo refresca automáticamente.
 
 Al terminar: “Actualizá las tareas verificadas, usá `nexo_record_session` con lo avanzado, los bloqueos y el próximo paso, y actualizá el perfil si cambió el contexto.” Una tarea puede declarar `dependsOn` para que Nexo muestre que está bloqueada hasta que se complete su predecesora.
 
 ## Botón Analizar con IA
 
-Usa tu instalación del **CLI nativo de Claude Code** (v2.1.248 o superior), ya autenticado. Ejecutá primero `claude --version` y `claude auth login` en tu terminal. El análisis usa tu plan o credenciales configuradas, con sus límites/costos. No se inicia automáticamente.
+Usa tu instalación del **CLI nativo de Claude Code** (v2.1.248 o superior), ya autenticado. Ejecutá primero `claude --version` y `claude auth login` en tu terminal. El análisis usa tu plan o credenciales configuradas, con sus límites/costos. No se inicia automáticamente. Además de sugerencias, completa los campos del perfil que pueda verificar desde el código y la documentación; nunca adivina datos faltantes.
 
 Registrá una **carpeta absoluta existente** y un objetivo. El botón ejecuta `claude -p` en modo restringido, con hooks desactivados, salida JSON estructurada y herramientas limitadas a Read, Glob y Grep, sin MCP adicional. No permite herramientas de edición o shell en ese análisis. Los resultados son sugerencias revisables. La respuesta se valida antes de guardarla; el perfil conserva el resumen del último análisis. Un análisis dura como máximo 5 minutos.
 

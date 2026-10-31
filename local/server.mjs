@@ -36,7 +36,7 @@ export async function startServer({port=Number(process.env.PORT)||4318,store=new
           let child;
           try {child=await analyze(project,s.tasks.filter(t=>t.projectId===projectId),data=>{
             try {
-              store.operate({type:'project.update',id:projectId,patch:{lastAnalysis:data.summary}});
+              store.operate({type:'project.update',id:projectId,patch:{...(data.profile||{}),lastAnalysis:data.summary}});
               let count=0;for(const t of data.tasks){if(store.read().tasks.some(x=>x.projectId===projectId&&x.title.toLocaleLowerCase()===t.title.toLocaleLowerCase()))continue;store.operate({type:'task.create',task:{...t,projectId,suggested:true}});count++;}
               Object.assign(job,{status:'completed',summary:data.summary,count});
             }catch(e){Object.assign(job,{status:'failed',error:e.message});}
