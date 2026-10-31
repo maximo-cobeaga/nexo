@@ -1,0 +1,29 @@
+{
+  "name": "nexo-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Tu espacio local de proyectos, conectado con Claude Code",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "node local/server.mjs",
+    "desktop": "electron .",
+    "mcp": "node local/mcp.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "pack:desktop": "electron-builder --dir",
+    "build:desktop": "electron-builder"
+  },
+  "devDependencies": {"electron": "^40.0.0", "electron-builder": "^26.0.0"},
+  "build": {
+    "appId": "com.nexo.workspace",
+    "productName": "Nexo",
+    "directories": {"output": "release"},
+    "files": ["dist/**/*", "local/**/*", "desktop/**/*", "package.json"],
+    "asar": false,
+    "win": {"target": "nsis"},
+    "mac": {"target": "dmg"},
+    "linux": {"target": "AppImage"},
+    "nsis": {"oneClick": false, "allowToChangeInstallationDirectory": true}
+  },
+  "engines": {"node": ">=22"}
+}

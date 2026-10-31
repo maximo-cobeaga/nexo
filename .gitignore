@@ -1,0 +1,8 @@
+node_modules/
+release/
+*.zip
+!dist/nexo-source.zip
+*.tar.gz
+.DS_Store
+*.log
+.nexo-data/
