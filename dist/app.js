@@ -216,3 +216,5 @@ async function boot(){
  else if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 boot();
+// Un proyecto puede nacer sin objetivo; solo el análisis con IA exige uno.
+new MutationObserver(()=>{const goal=overlay.querySelector('#p-goal[required]');if(goal){goal.required=false;const label=overlay.querySelector('label[for="p-goal"]');if(label&&!label.textContent.includes('Opcional'))label.innerHTML='¿Qué significa terminarlo? <small>Opcional por ahora</small>';}}).observe(overlay,{childList:true,subtree:true});
