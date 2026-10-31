@@ -52,7 +52,7 @@ export function applyOperation(state, op) {
   } else if (op.type === 'project.update') {
     const p = s.projects.find(x => x.id === op.id); if (!p) throw Error('No encontramos ese proyecto.');
     const patch = op.patch || {};
-    for (const key of ['name','description','about','goal','path','repository','stack','runCommand','website','notes','nextStep','lastAnalysis']) if (key in patch) p[key] = str(patch[key], key === 'name' ? 120 : key === 'notes' ? 10000 : 4000);
+    for (const key of ['name','description','about','goal','path','repository','stack','runCommand','website','notes','nextStep','lastAnalysis']) if (key in patch) p[key] = str(patch[key], key === 'name' ? 120 : ['notes','lastAnalysis'].includes(key) ? 12000 : 4000);
     if (!p.name) throw Error('El proyecto necesita un nombre.');
     if (p.repository && !/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/.test(p.repository)) throw Error('Usá una URL de repositorio de GitHub válida.');
     if (p.website && !/^https?:\/\//.test(p.website)) throw Error('Usá una URL web válida que empiece con https:// o http://.');
